@@ -1,0 +1,9 @@
+langgraph>=1.0,<2
+langchain-openai>=1.0,<2
+python-dotenv>=1.0
+pypdf>=5.0
+rich>=13
+fastapi>=0.110
+uvicorn>=0.30
+qdrant-client>=1.9
+python-multipart>=0.0.9

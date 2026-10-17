@@ -1,93 +1,64 @@
-# RAGEXP
+# Evidence RAG
 
+Ask questions about a PDF and get answers that are **grounded, cited and scored**. LangGraph pipeline, Azure OpenAI
+(embeddings + chat via the Responses API), in-memory Qdrant for vectors, local BM25, FastAPI + a small web UI.
 
-
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
-
+## Setup
+```bash
+python -m venv .venv && source .venv/bin/activate    # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/hobby7155205/ragexp.git
-git branch -M main
-git push -uf origin main
+Create `.env`:
+```
+AZURE_OPENAI_ENDPOINT=...                 # embeddings resource
+AZURE_OPENAI_API_KEY=...
+AZURE_OPENAI_API_VERSION=...
+AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-large
+AZURE_OPENAI_CHAT_DEPLOYMENT=...          # chat model (Responses API)
+AZURE_OPENAI_CHAT_ENDPOINT=...            # optional: if chat lives on a different resource
+AZURE_OPENAI_CHAT_API_KEY=...
+AZURE_OPENAI_CHAT_API_VERSION=...
+EVIDENCE_PDF=C:\path\to\file.pdf          # optional: index this PDF at startup
+LOG_LEVEL=INFO                            # console level (the log file is always DEBUG)
+TRACE_PAYLOADS=1                          # 0 = keep prompts/responses out of run records
 ```
 
-## Integrate with your tools
+## Run
+- **UI + API:** `uvicorn server:app --port 8000 --no-access-log` → http://localhost:8000 (upload a PDF, ask questions)
+- **CLI:** `python rag.py report.pdf "What was net income?" "What were total assets?"`
 
-* [Set up project integrations](https://gitlab.com/hobby7155205/ragexp/-/settings/integrations)
+## Pipeline
+`analyze` (LLM extracts metric / period / search query) → `retrieve` (Qdrant cosine + BM25, reciprocal-rank fusion)
+→ `rerank` (rule-based boosts) → `verify` (evidence must contain the metric and period; else retry once, then abstain)
+→ `infer` (LLM answers with `[chunk]` citations) → `validate` (0–1 verification score).
 
-## Collaborate with your team
+Questions run in parallel (one LangGraph `Send` branch each). Uploads are parsed, embedded (batched, with rate-limit
+backoff) and indexed in the background; each document gets its own in-memory Qdrant collection (lost on restart; embeddings
+are cached in `.cache/`).
 
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+**Verification score** = weighted mean of: LLM faithfulness judge (.40), numbers found verbatim (.20), metric present (.15),
+period present (.10), valid citation (.10), rank of cited chunk (.05). Inapplicable checks are dropped and weights rescaled.
+High ≥ 0.8, low < 0.5. The score is advisory; it never blocks an answer.
 
-## Test and Deploy
+## Tracing
+Every log line is tagged `[run · question · step]`, so one question can be followed end to end:
 
-Use the built-in continuous integration in GitLab.
+| Where | What |
+|---|---|
+| console | INFO: one line per step with timing, LLM token counts, retrieval ranks (`bm25#` / `vec#`), routing decisions |
+| `logs/rag.log` | DEBUG, rotating: prompts and responses, candidate tables, score breakdowns. `grep "a1b2c3 · q2" logs/rag.log` |
+| `logs/runs/<run_id>.json` | one structured record per run: settings, results, and per-step `trace` with `detail` |
+| `GET /api/runs`, `/api/runs/{run_id}` | list / fetch run records (the UI links the run id) |
+| UI | each result card: verification breakdown + step timeline with expandable detail |
 
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
+HTTP requests are logged with an `X-Request-ID` header value (`http-xxxxxx` in the tag); background uploads use `ingest-xxxxxxxx`.
 
-***
+## Files
+`graph.py` pipeline · `store.py` PDF loading, embeddings, Qdrant+BM25 index, document registry · `verification.py` scoring ·
+`llm.py` Azure clients and traced calls · `logsetup.py` logging · `server.py` API · `rag.py` CLI · `ui.html` front end.
 
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+## Limits / production notes
+- Text-based PDFs only (scanned PDFs need OCR first). Max upload 50 MB. One document per question.
+- Rerank is a rule-based stand-in; use a cross-encoder or Azure semantic ranker for production.
+- Verification is LLM-judged claim support plus literal checks, not formal entailment.
+- Swap the in-memory Qdrant for a persistent store (`QdrantClient(path=...)` / server) to survive restarts.

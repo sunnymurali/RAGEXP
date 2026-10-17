@@ -1,0 +1,86 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Evidence RAG · Node Designer</title><style>
+:root{font:14px system-ui,-apple-system,Segoe UI,Arial;color:#182437;background:#f4f6fa}*{box-sizing:border-box}body{margin:0}header{height:66px;background:#13243b;color:white;display:flex;align-items:center;justify-content:space-between;padding:0 30px;gap:12px}header b{font-size:19px}.tag{font-size:11px;border:1px solid #718198;border-radius:20px;padding:5px 9px}main{max-width:1370px;margin:24px auto;padding:0 20px;display:grid;grid-template-columns:minmax(300px,390px) 1fr;gap:20px}.panel{background:white;border:1px solid #e3e7ee;border-radius:17px;box-shadow:0 4px 18px #12263e0b;overflow:hidden}.settings{padding:24px}.section-title{font-size:17px;font-weight:700;margin:0 0 18px}.muted{color:#69788e;font-size:12px}label{display:block;font-size:12px;font-weight:650;margin:14px 0 7px}input,textarea,select{width:100%;font:inherit;padding:11px 12px;color:#28364a;background:#fff;border:1px solid #d8dfeb;border-radius:9px}textarea{resize:vertical;min-height:68px}.tabs{display:flex;gap:5px;padding:5px;background:#eef2f7;border-radius:10px;margin:18px 0}.tab{flex:1;border:0;background:transparent;padding:9px;border-radius:7px;color:#67758a;cursor:pointer}.tab.active{background:white;color:#1a4e83;box-shadow:0 2px 4px #0000000e;font-weight:700}.hidden{display:none}.btn{border:0;border-radius:9px;padding:11px 14px;font:inherit;font-weight:650;cursor:pointer}.primary{background:#2463a1;color:white}.outline{border:1px solid #cfdae7;background:white;color:#23609c}.subtle{background:#edf3fa;color:#285b93}.danger{background:none;border:0;color:#a34d56;cursor:pointer;font-size:18px}.question-row{display:flex;align-items:center;gap:8px;margin:8px 0}.question-row input{flex:1;min-width:0}.question-row span{color:#78869a;font-size:12px}.flex{display:flex;align-items:center;gap:9px}.between{justify-content:space-between}.switch{display:flex;align-items:center;justify-content:space-between;margin:16px 0;font-size:13px}.switch input{width:17px;height:17px;accent-color:#2463a1}.stage{padding:22px 25px 10px}.stage h2{font-size:22px;margin:0 0 7px}.workflow{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:23px 0}.step{padding:12px 5px;text-align:center;background:#edf2f8;border-radius:9px;color:#5d7289;font-size:12px}.step.on{background:#e0eefb;color:#15568a;font-weight:750}.step.accent{background:#fff0d9;color:#9d5905}.results-head{padding:0 25px 18px}.results{padding:0 25px 22px;display:grid;gap:11px}.result{border:1px solid #dbe4ee;border-radius:12px;overflow:hidden}.res-top{padding:15px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;gap:8px}.res-top strong{font-size:13px}.pill{font-size:11px;border-radius:30px;padding:5px 9px;white-space:nowrap;background:#e6f5ed;color:#13764a}.pill.warn{background:#fff0dd;color:#a06113}.res-body{border-top:1px solid #e6e9f1;padding:15px;background:#fcfdff;line-height:1.65}.quote{background:#edf3f8;border-left:3px solid #2867a3;padding:10px 12px;margin:12px 0;font-size:12px}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:13px}.metric{background:#f6f8fb;border-radius:10px;padding:15px;text-align:center}.metric b{display:block;font-size:22px;color:#1a527f}.metric span{color:#67778c;font-size:11px}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}.footer{font-size:12px;color:#7a8697;padding:0 25px 24px}@media(max-width:860px){main{grid-template-columns:1fr;margin:13px auto;padding:0 12px}header{padding:0 15px}.stage{padding:18px 15px 4px}.results,.results-head{padding-left:15px;padding-right:15px}.workflow{gap:3px}.step{font-size:10px;padding:11px 2px}}@media(max-width:420px){.metrics{gap:5px}.metric{padding:10px 4px}.metric b{font-size:18px}}
+.trace{margin-top:12px;font-size:12px}.trace summary{cursor:pointer;color:#285b93;font-weight:650}.trace ol{margin:8px 0 0;padding-left:20px;line-height:1.45}.trace li{margin:6px 0}.ms{color:#2463a1;font-size:11px;margin-left:6px}.pill.bad{background:#fde4e4;color:#a1303a}.vt{width:100%;border-collapse:collapse;margin-top:8px;font-size:12px}.vt td{padding:4px 6px;vertical-align:middle}.bar{width:90px;height:7px;background:#e6ecf3;border-radius:5px;overflow:hidden}.bar i{display:block;height:100%;background:#2463a1}.trace pre{margin:6px 0 2px;padding:8px;background:#f3f6fa;border-radius:6px;font-size:11px;overflow:auto;max-height:260px;white-space:pre-wrap}.trace li>details>summary{font-weight:500;font-size:11px;color:#69788e}.runid{font-family:ui-monospace,Consolas,monospace}</style></head><body><header><div><b>◈ Evidence RAG</b> <span style="opacity:.65;font-size:12px">/ Workflow Designer</span></div><span class="tag">LIVE</span></header><main><section class="panel settings"><h2 class="section-title">RAG Node Settings</h2><label>Document</label><select id="doc"></select><div class="flex" style="margin-top:8px"><button class="btn outline" id="upbtn" style="flex:1">⬆ Upload PDF</button><input type="file" id="upfile" accept="application/pdf,.pdf" style="display:none"></div><div class="muted" id="upstate"></div><label>Node name</label><input value="Document Q&amp;A"><label>Description</label><textarea>Retrieve, verify and answer independent questions from the selected document.</textarea><div class="tabs"><button class="tab active" data-tab="questions">Questions</button><button class="tab" data-tab="retrieval">Retrieval</button><button class="tab" data-tab="validation">Validation</button></div><div id="questions" class="tab-content"><div class="flex between"><strong>Questions</strong><span class="muted" id="count">3 configured</span></div><div id="question-list"></div><button class="btn outline" style="width:100%;margin-top:10px" id="add">+ Add question</button><label>Shared inference prompt</label><textarea id="prompt">Answer only from the supplied evidence. Cite page and chunk. If unsupported, abstain.</textarea></div><div id="retrieval" class="tab-content hidden"><label>Strategy</label><select id="strategy"><option>Hybrid (vector + keyword)</option><option>Vector only</option><option>Keyword only</option></select><label>Initial retrieval candidates: <b id="kvalue">30</b></label><input id="k" type="range" min="10" max="60" value="30" step="5"><label>Evidence passages after reranking</label><select id="final"><option>5</option><option selected>8</option><option>10</option></select><div class="switch">Enable reranking <input id="rerank" type="checkbox" checked></div><label>Question concurrency</label><select id="concurrency"><option>1</option><option selected>3</option><option>5</option></select></div><div id="validation" class="tab-content hidden"><div class="switch">LLM faithfulness check (adds a few s/question) <input id="judge" type="checkbox" checked></div><label>Maximum additional retrieval attempts</label><select id="retries"><option>0</option><option selected>1</option><option>2</option></select><p class="muted">Every answer is checked against its cited evidence and given a 0–1 score. Claim-level entailment and contradiction detection are not implemented.</p></div><div class="actions"><button class="btn primary" id="run">▶ Run</button><button class="btn subtle" id="copy">Copy JSON config</button></div></section><section class="panel"><div class="stage"><div class="flex between"><div><h2>Question Execution</h2><div class="muted">One indexed document · independent query branches</div></div><span class="pill" id="indexpill">No document</span></div><div class="workflow"><div class="step on">Analyze</div><div class="step on">Hybrid search</div><div class="step on">Rerank</div><div class="step accent">Verify</div><div class="step on">Generate</div></div></div><div class="results-head flex between"><strong>Execution results</strong><span class="muted" id="runstate">Ready</span></div><div class="results" id="results"></div><div class="results-head"><strong>Execution summary</strong><div class="metrics"><div class="metric"><b id="done">2</b><span>Answered</span></div><div class="metric"><b id="flagged">1</b><span>Needs evidence</span></div><div class="metric"><b id="total">3</b><span>Questions</span></div></div></div><div class="footer">Loading…</div></section></main><script>
+let questions=[], INFO={documents:[]}, DOC='';
+const $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
+const STATUS={answered:['Answered',''],insufficient_evidence:['Insufficient evidence','warn'],error:['Error','bad']};
+
+function drawQuestions(){
+  $('#count').textContent=questions.length+' configured';
+  $('#question-list').innerHTML=questions.map((q,i)=>`<div class="question-row"><span>Q${i+1}</span><input placeholder="Ask a question about the document…" aria-label="Question ${i+1}" data-q="${i}" value="${esc(q)}"><button class="danger" data-del="${i}" title="Remove question">×</button></div>`).join('');
+  document.querySelectorAll('[data-q]').forEach(el=>el.addEventListener('input',()=>questions[+el.dataset.q]=el.value));
+  document.querySelectorAll('[data-del]').forEach(el=>el.addEventListener('click',()=>{if(questions.length>1){questions.splice(+el.dataset.del,1);drawQuestions();}}));
+}
+
+function traceHtml(trace){
+  return (trace||[]).map(t=>`<li><b>${esc(t.node)}</b> <span class="ms">+${t.at_ms} ms · ${t.ms} ms</span><br><span class="muted">${esc(t.summary)}</span>${t.detail&&Object.keys(t.detail).length?`<details><summary>detail</summary><pre>${esc(JSON.stringify(t.detail,null,1))}</pre></details>`:''}</li>`).join('');
+}
+
+function drawResults(results){
+  let answered=0;
+  $('#results').innerHTML=results.map((r,i)=>{
+    const ok=r.status==='answered'; if(ok)answered++; const [label,cls]=STATUS[r.status]||[r.status,'warn'];
+    const cites=(r.citations||[]).map(c=>`Page ${c.page} · Chunk ${c.chunk_id}`).join(' | ');
+    const body=ok
+      ? `<strong>${esc(r.answer)}</strong><div class="quote">${esc(r.quote).replace(/\n/g,'<br>')}</div><div class="muted">Document: ${esc(DOC)} &nbsp; | &nbsp; ${esc(cites)}</div>`
+      : `<strong>Answer withheld</strong><p class="muted">${esc((r.validation_reasons||[]).join('; ')||(r.warnings||[]).join('; ')||'The evidence did not support an answer.')}</p>`;
+    const v=r.verification, vcls=v?{high:'',medium:'warn',low:'bad'}[v.label]:'';
+    const score=v?`<span class="pill ${vcls}" title="Answer verification score">Score ${v.score.toFixed(2)}</span>`:'';
+    const vbox=v?`<details class="trace" open><summary>Verification score ${v.score.toFixed(2)} · ${v.label}</summary><table class="vt">${Object.entries(v.components).map(([k,c])=>`<tr><td>${esc(k)}</td><td><div class="bar"><i style="width:${c.score==null?0:c.score*100}%"></i></div></td><td>${c.score==null?'n/a':c.score.toFixed(2)}</td><td class="muted">${esc(c.detail)}</td></tr>`).join('')}</table></details>`:'';
+    const warn=(r.warnings||[]).length&&ok?`<p class="muted" style="color:#a06113">⚠ ${esc(r.warnings.join('; '))}</p>`:'';
+    return `<details class="result" ${i===0?'open':''}><summary class="res-top"><strong>Q${i+1}. ${esc(r.question||'(Empty question)')}</strong><span class="flex"><span class="pill ${cls}">${label}</span>${score}</span></summary><div class="res-body">${body}${vbox}${warn}<details class="trace"><summary>Processing trace · ${r.attempts} retrieval attempt(s) · ${r.latency_ms} ms</summary><ol>${traceHtml(r.trace)}</ol></details></div></details>`}).join('');
+  $('#done').textContent=answered;$('#flagged').textContent=results.length-answered;$('#total').textContent=results.length;
+}
+
+function settings(){return {document_id:$('#doc').value,questions:questions.filter(q=>q.trim()),prompt:$('#prompt').value,k:+$('#k').value,top_n:+$('#final').value,
+  strategy:{'Hybrid (vector + keyword)':'hybrid','Vector only':'vector','Keyword only':'keyword'}[$('#strategy').value],rerank:$('#rerank').checked,judge:$('#judge').checked,
+  max_retries:+$('#retries').value,max_concurrency:+$('#concurrency').value}}
+
+async function run(){
+  const st=settings(); if(!st.document_id){$('#runstate').textContent='Upload a PDF first';return;} if(!st.questions.length)return;
+  $('#run').disabled=true;$('#runstate').textContent='Running…';
+  $('#results').innerHTML='<div class="muted">Retrieving, reranking, verifying and answering — live logs are in the server terminal and logs/rag.log.</div>';
+  try{
+    const r=await fetch('/api/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(st)});
+    if(r.status===404){await loadInfo();useDoc(INFO.documents.length?INFO.documents[0].document_id:'',false);throw new Error('That document is no longer on the server (it restarts empty). The list was refreshed — select a document, or upload it again, and re-run.');}
+    if(!r.ok)throw new Error((await r.json()).detail||await r.text());
+    const d=await r.json(); drawResults(d.results);
+    $('#runstate').innerHTML=`Run <a class="runid" href="/api/runs/${d.run_id}" target="_blank">${d.run_id}</a> · ${(d.elapsed_ms/1000).toFixed(1)} s`;
+  }catch(e){$('#results').innerHTML=`<div class="res-body"><strong>Request failed</strong><p class="muted">${esc(e.message)}</p></div>`;$('#runstate').textContent='Failed'}
+  $('#run').disabled=false;
+}
+
+function fillDocs(){
+  $('#doc').innerHTML=INFO.documents.length?INFO.documents.map(d=>`<option value="${esc(d.document_id)}">${esc(d.document_id)} (${d.pages} pp)</option>`).join(''):'<option value="">— upload a PDF —</option>';
+}
+function useDoc(id,resetQs){
+  const d=INFO.documents.find(x=>x.document_id===id); DOC=d?id:''; if(d)$('#doc').value=id;
+  if(resetQs){questions=[''];drawQuestions();$('#results').innerHTML='<div class="muted">Enter questions and press “Run”.</div>';$('#runstate').textContent='Ready';}
+  $('#indexpill').textContent=d?'Index ready':'No document';
+  $('.footer').textContent=d?`${d.document_id} · ${d.pages} pages · ${d.chunks} chunks · ${INFO.embedding_model} (dim ${d.dim}) in Qdrant (memory) · answers by ${INFO.chat_model}`:'Upload a PDF to begin.';
+  $('.stage .muted').textContent=d?`${d.document_id} · independent query branches`:'No document selected';
+}
+async function loadInfo(){INFO=await (await fetch('/api/info')).json();fillDocs();}
+
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t===b));document.querySelectorAll('.tab-content').forEach(p=>p.classList.toggle('hidden',p.id!==b.dataset.tab));});
+$('#add').onclick=()=>{questions.push('');drawQuestions()};$('#k').oninput=()=>$('#kvalue').textContent=$('#k').value;$('#run').onclick=run;
+$('#doc').onchange=()=>useDoc($('#doc').value,true);
+$('#copy').onclick=async()=>{try{await navigator.clipboard.writeText(JSON.stringify(settings(),null,2));$('#copy').textContent='Copied configuration';setTimeout(()=>$('#copy').textContent='Copy JSON config',1700)}catch(e){$('#copy').textContent='Clipboard unavailable'}};
+$('#upbtn').onclick=()=>$('#upfile').click();
+$('#upfile').onchange=async()=>{
+  const f=$('#upfile').files[0]; if(!f)return; const fd=new FormData(); fd.append('file',f);
+  $('#upbtn').disabled=true;$('#upstate').textContent=`Uploading ${f.name}…`;
+  const label={queued:'Queued',parsing:'Parsing PDF',embedding:'Embedding chunks',indexing:'Loading into Qdrant'};
+  try{const r=await fetch('/api/upload',{method:'POST',body:fd}); if(!r.ok)throw new Error((await r.json()).detail||await r.text());
+    const {job_id}=await r.json(); let j;
+    while(true){ j=await (await fetch('/api/upload/'+job_id)).json(); if(j.stage==='done'||j.stage==='error')break;
+      $('#upstate').textContent=`${label[j.stage]||j.stage}${j.total?` ${j.done}/${j.total}`:''}… (large files can take a few minutes if Azure rate-limits embeddings)`; await new Promise(r=>setTimeout(r,1000)); }
+    if(j.stage==='error')throw new Error(j.error);
+    await loadInfo(); useDoc(j.result.document_id,true);
+    $('#upstate').textContent=`Indexed ${j.result.document_id}: ${j.result.pages} pages, ${j.result.chunks} chunks. Enter your questions and press Run.`;
+  }catch(e){$('#upstate').textContent='Upload failed: '+e.message}
+  $('#upbtn').disabled=false;$('#upfile').value='';
+};
+(async()=>{try{await loadInfo();$('.tag').textContent='LIVE';useDoc(INFO.documents.length?INFO.documents[0].document_id:'',true);}
+  catch(e){$('#results').innerHTML='<div class="muted">Server not reachable — start it with: uvicorn server:app</div>'}})();
+</script></body></html>
